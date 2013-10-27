@@ -27,6 +27,7 @@ void loop()
 {
   lcd.clear();
 
+  read_input();
   // Write our first line.
   lcd.setCursor(0, 0);
   line = buffer.substring(seek, seek+16);
