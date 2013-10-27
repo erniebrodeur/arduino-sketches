@@ -1,3 +1,6 @@
+/*
+   This project will page scroll a block of text echoed to the serial input.
+*/
 
 #include <LiquidCrystal.h>
 
@@ -22,6 +25,37 @@ void setup()
 
 void loop()
 {
+  lcd.clear();
+
+  // Write our first line.
+  lcd.setCursor(0, 0);
+  line = buffer.substring(seek, seek+16);
+  lcd.print(line);
+
+  // Write our second line.
+  lcd.setCursor(0, 1);
+  line = buffer.substring(seek+16, seek+32);
+  lcd.print(line);
+
+
+  // If we are < 32, don't page.
+  if (buffer.length() > 32) {
+    // Even though we've grabbed 32 characters, we only seek 16.
+    // This gives us our text flow effect.  By shifting one line into the next.
+    seek += 16;
+  }
+
+  // Are we past the end, reset.
+  if (seek > buffer.length()) {
+    seek = 0;
+  }
+
+  // One second per line, kinda fast, might need to be tuned as needed.
+  delay(1000);
+}
+
+// Did we get new input? if so update our buffer.
+void read_input() {
   if (Serial.available()) {
     buffer = "";
 
@@ -34,28 +68,4 @@ void loop()
     lcd.clear();
     seek = 0;
   }
-
-  // If we've passed the end of our buffer, lets restart.
-  if (seek > buffer.length()) {
-    seek = 0;
-  }
-
-
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  line = buffer.substring(seek, seek+16);
-  lcd.print(line);
-
-  lcd.setCursor(0, 1);
-  line = buffer.substring(seek+16, seek+32);
-  lcd.print(line);
-
-  // Even though we've grabbed 32 characters, we only seek 16.
-  // This gives us our text flow effect.
-
-  if (buffer.length() > 32) {
-    seek += 16;
-  }
-
-  delay(1000);
 }
